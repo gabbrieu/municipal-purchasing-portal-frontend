@@ -1,7 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { FormikFieldType } from '@/types/common';
 import { ILoginValues } from '@/types/user';
+import { api } from '@/utils/fetch';
 import {
   Box,
   Button,
@@ -12,18 +14,63 @@ import {
   FormLabel,
   Input,
   Stack,
+  useToast,
 } from '@chakra-ui/react';
 import { Field, Form, Formik } from 'formik';
+import { useState } from 'react';
 
 export default function Login() {
+  const [loading, setLoading] = useState<boolean>(false);
+  const toast = useToast();
   const initialValues: ILoginValues = {
     city: '',
     username: '',
     password: '',
   };
 
-  const handleSubmit = (values: ILoginValues) => {
-    console.log(values);
+  const handleSubmit = async (values: ILoginValues) => {
+    setLoading(true);
+
+    try {
+      const data = await api('/users/login', {
+        method: 'POST',
+        body: JSON.stringify(values),
+      });
+
+      toast({
+        title: 'Login bem-sucedido.',
+        description: 'Você foi autenticado com sucesso!',
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+        position: 'top',
+      });
+
+      console.log(data);
+    } catch (error: any) {
+      if (error?.cause?.errorBody.statusCode === 401) {
+        toast({
+          title: 'Erro no login',
+          description: 'Verifique suas credenciais e tente novamente.',
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+          position: 'top',
+        });
+      } else {
+        toast({
+          title: 'Erro no login',
+          description:
+            'Algo deu errado no servidor, tente novamente mais tarde',
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+          position: 'top',
+        });
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -49,7 +96,7 @@ export default function Login() {
                         isInvalid={!!form.errors.city && form.touched.city}
                         isRequired
                       >
-                        <FormLabel size="xs" textTransform="uppercase">
+                        <FormLabel fontSize="small" textTransform="uppercase">
                           Cidade
                         </FormLabel>
                         <Input {...field} type="text" variant="outline" />
@@ -69,7 +116,7 @@ export default function Login() {
                         }
                         isRequired
                       >
-                        <FormLabel size="xs" textTransform="uppercase">
+                        <FormLabel fontSize="small" textTransform="uppercase">
                           Usuário
                         </FormLabel>
                         <Input {...field} type="text" variant="outline" />
@@ -91,7 +138,7 @@ export default function Login() {
                         }
                         isRequired
                       >
-                        <FormLabel size="xs" textTransform="uppercase">
+                        <FormLabel fontSize="small" textTransform="uppercase">
                           Senha
                         </FormLabel>
                         <Input {...field} type="password" variant="outline" />
@@ -107,7 +154,7 @@ export default function Login() {
                     width="full"
                     type="submit"
                     colorScheme="blue"
-                    isLoading={props.isSubmitting}
+                    isLoading={props.isSubmitting || loading}
                   >
                     Login
                   </Button>
