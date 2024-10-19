@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
+import { useCustomToast } from '@/hooks/custom-toast';
 import { FormikFieldType } from '@/types/common';
 import { ILoginValues } from '@/types/user';
 import { api } from '@/utils/fetch';
@@ -14,14 +15,16 @@ import {
   FormLabel,
   Input,
   Stack,
-  useToast,
 } from '@chakra-ui/react';
 import { Field, Form, Formik } from 'formik';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
+// TODO: adicionar validação dos campos
 export default function Login() {
   const [loading, setLoading] = useState<boolean>(false);
-  const toast = useToast();
+  const toast = useCustomToast();
+  const router = useRouter();
   const initialValues: ILoginValues = {
     city: '',
     username: '',
@@ -32,30 +35,18 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const data = await api('/users/login', {
+      await api('/auth/login', {
         method: 'POST',
         body: JSON.stringify(values),
       });
 
-      toast({
-        title: 'Login bem-sucedido.',
-        description: 'Você foi autenticado com sucesso!',
-        status: 'success',
-        duration: 3000,
-        isClosable: true,
-        position: 'top',
-      });
-
-      console.log(data);
+      router.push('/');
     } catch (error: any) {
-      if (error?.cause?.errorBody.statusCode === 401) {
+      if (error?.cause?.errorBody?.statusCode?.toString().startsWith('4')) {
         toast({
           title: 'Erro no login',
           description: 'Verifique suas credenciais e tente novamente.',
           status: 'error',
-          duration: 3000,
-          isClosable: true,
-          position: 'top',
         });
       } else {
         toast({
@@ -63,9 +54,6 @@ export default function Login() {
           description:
             'Algo deu errado no servidor, tente novamente mais tarde',
           status: 'error',
-          duration: 3000,
-          isClosable: true,
-          position: 'top',
         });
       }
     } finally {

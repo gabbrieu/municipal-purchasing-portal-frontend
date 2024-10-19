@@ -1,5 +1,9 @@
-import { redirect } from "next/navigation";
+import { Card, CardBody } from '@chakra-ui/react';
 
-export default function Home() {
-  redirect("/users/login");
+export default function Page() {
+  return (
+    <Card>
+      <CardBody></CardBody>
+    </Card>
+  );
 }
