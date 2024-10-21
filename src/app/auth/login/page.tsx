@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { useCustomToast } from '@/hooks/custom-toast';
@@ -144,7 +143,7 @@ export default function Login() {
                     colorScheme="blue"
                     isLoading={props.isSubmitting || loading}
                   >
-                    Login
+                    Entrar
                   </Button>
                 </Stack>
               </Form>

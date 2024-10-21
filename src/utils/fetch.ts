@@ -3,7 +3,7 @@ export const createFetchInstance = (baseURL: string) => {
   return async <T = any>(
     endpoint: string,
     options: RequestInit = {}
-  ): Promise<T> => {
+  ): Promise<T | undefined> => {
     const url = `${baseURL}${endpoint}`;
 
     let response = await fetch(url, {
@@ -25,6 +25,8 @@ export const createFetchInstance = (baseURL: string) => {
         cause: { errorBody },
       });
     }
+
+    if (response.status === 204) return;
 
     return await response.json();
   };

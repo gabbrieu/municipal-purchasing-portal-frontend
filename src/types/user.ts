@@ -12,8 +12,15 @@ export enum ERoles {
 export interface IReqUser {
   userId: number;
   username: string;
+  name: string;
   city: string;
   cpf: string;
   email: string;
   role: ERoles;
+}
+
+export interface IGetSessionData {
+  data: IReqUser | undefined;
+  loading: boolean;
+  error: Error | undefined;
 }
