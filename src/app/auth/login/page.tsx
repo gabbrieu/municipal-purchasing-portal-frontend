@@ -4,6 +4,7 @@ import { useCustomToast } from '@/hooks/custom-toast';
 import { FormikFieldType } from '@/types/common';
 import { ILoginValues } from '@/types/user';
 import { api } from '@/utils/fetch';
+import { SessionStorageHelper } from '@/utils/sessionStorage';
 import {
   Box,
   Button,
@@ -17,7 +18,7 @@ import {
 } from '@chakra-ui/react';
 import { Field, Form, Formik } from 'formik';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 // TODO: adicionar validação dos campos
 export default function Login() {
@@ -29,6 +30,10 @@ export default function Login() {
     username: '',
     password: '',
   };
+
+  useEffect(() => {
+    SessionStorageHelper.clearAll();
+  }, []);
 
   const handleSubmit = async (values: ILoginValues) => {
     setLoading(true);

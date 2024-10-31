@@ -1,8 +1,10 @@
 'use client';
 
 import { GeneralButton } from '@/components/Button/GeneralButton';
+import { useCustomToast } from '@/hooks/custom-toast';
 import { useSessionData } from '@/hooks/get-session-data';
 import { api } from '@/utils/fetch';
+import { SessionStorageHelper } from '@/utils/sessionStorage';
 import {
   Circle,
   Flex,
@@ -18,7 +20,6 @@ import {
 import { useRouter } from 'next/navigation';
 import React, { useRef, useState } from 'react';
 import { FiLogOut, FiUser } from 'react-icons/fi';
-import { useCustomToast } from '../../hooks/custom-toast';
 import { UserInfo } from './UserInfo';
 
 export const UserConfigPopover: React.FC = () => {
@@ -36,6 +37,8 @@ export const UserConfigPopover: React.FC = () => {
     try {
       setLoading(true);
       await api('/auth/logout', { method: 'POST' });
+
+      SessionStorageHelper.clearAll();
 
       router.push('/auth/login');
     } catch (error: any) {

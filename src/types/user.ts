@@ -9,14 +9,35 @@ export enum ERoles {
   USER = 'USER',
 }
 
+export interface IBackendReqUser {
+  userId: number;
+  username: string;
+  name: string;
+  cpf: string;
+  city: string;
+  email: string;
+  role: ERoles;
+}
+
 export interface IReqUser {
   userId: number;
+  username: string;
+  name: string;
+  city: string;
+  email: string;
+  role: ERoles;
+}
+
+export interface IJWTPayload {
+  sub: number;
   username: string;
   name: string;
   city: string;
   cpf: string;
   email: string;
   role: ERoles;
+  iat: number;
+  exp: number;
 }
 
 export interface IGetSessionData {

@@ -1,5 +1,6 @@
-import { IGetSessionData, IReqUser } from '@/types/user';
+import { IBackendReqUser, IGetSessionData, IReqUser } from '@/types/user';
 import { api } from '@/utils/fetch';
+import { SessionStorageHelper } from '@/utils/sessionStorage';
 import { useEffect, useState } from 'react';
 
 export function useSessionData(): IGetSessionData {
@@ -12,12 +13,21 @@ export function useSessionData(): IGetSessionData {
       try {
         setLoading(true);
 
-        const data = await api<IReqUser>('/users/profile', {
-          credentials: 'include',
-        });
+        let userOnSessionStorage = SessionStorageHelper.get<IReqUser>('user');
+
+        if (!userOnSessionStorage) {
+          const data = await api<IBackendReqUser>('/users/profile', {
+            credentials: 'include',
+          });
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const { cpf, ...rest } = data!;
+          userOnSessionStorage = rest;
+
+          SessionStorageHelper.add<IReqUser>('user', userOnSessionStorage);
+        }
 
         setLoading(false);
-        setUserData(data);
+        setUserData(userOnSessionStorage);
       } catch (error: any) {
         const message = error?.message || 'Erro ao buscar dados da sessão';
 

@@ -1,3 +1,5 @@
+import { SessionStorageHelper } from './sessionStorage';
+
 export const createFetchInstance = (baseURL: string) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return async <T = any>(
@@ -64,12 +66,21 @@ async function refreshToken({
 
       return response;
     } else {
-      window.location.href = '/auth/login';
       throw new Error('Failed to refresh token, redirecting to login.');
     }
   } catch (error) {
+    await fetch(`${baseURL}/auth/logout`, {
+      method: 'POST',
+      credentials: 'include',
+    }).catch(() => {
+      throw new Error('Error while logout');
+    });
+
+    window.location.href = '/auth/login';
     console.error('Error during token refresh: ', error);
     throw new Error('Token refresh failed');
+  } finally {
+    SessionStorageHelper.clearAll();
   }
 }
 
